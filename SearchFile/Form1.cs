@@ -14,7 +14,6 @@ using System.Windows.Forms;
 
 namespace SearchFile
 {
-
     // TODO:
     // DONE 1. Реализовать поиск файлов по директории, шаблону имени и тексту внутри файла
     // DONE 2. Прикрутить БД, чтобы не терять данные из TextBox при закрытии программы
@@ -145,13 +144,13 @@ namespace SearchFile
             LoadData();
         }
 
-        private void LoadData()
+        private async void LoadData()
         {
             string sqlCommand = "SELECT * FROM [Table]";
-            string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=\"D:\\New learn C#\\SearchFile\\SearchFile\\Database.mdf\";Integrated Security=True";
+            string connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MyDB"].ConnectionString;
             using (SqlConnection con = new SqlConnection(connectionString))
             {
-                con.Open();
+                await con.OpenAsync();
 
                 SqlCommand command = new SqlCommand(sqlCommand, con);
 
@@ -170,16 +169,16 @@ namespace SearchFile
             }
         }
 
-        private void AddData(string path, string pattern, string text)
+        private async void AddData(string path, string pattern, string text)
         {
             string sqlCommand = string.Format($"Update [Table] Set InputPath = '{path}', InputPattern = '{pattern}', InputText = '{text}'");
 
             using (SqlConnection con = new SqlConnection("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=\"D:\\New learn C#\\SearchFile\\SearchFile\\Database.mdf\";Integrated Security=True"))
             {
-                con.Open();
+                await con.OpenAsync();
                 using (SqlCommand cmd = new SqlCommand(sqlCommand, con))
                 {
-                    cmd.ExecuteNonQuery();
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
